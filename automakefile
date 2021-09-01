@@ -1,0 +1,43 @@
+#!/bin/bash
+source src/tabs.sh
+source src/parser.sh
+source src/content.sh
+
+name=""
+header='##
+## EPITECH PROJECT, 2021
+## Makefile
+## File description:
+## Makefile
+##
+'
+if [ $# -ne 1 ] || [ ! -f $1 ] || [ ! -r $1 ]; then
+    exit 84
+fi
+dir=$(find_args $1 PROJECT_DIR)
+name=$(find_args $1 EXEC)
+if [ -z $dir ] || [ ! -d $dir ];then
+    exit 84
+fi
+touch "$dir/Makefile"
+echo "$header" > "$dir/Makefile"
+if [[ $name != "" ]];then
+    parser.EXEC $name $dir
+else
+    parser.EXEC "a.out" $dir
+fi
+parser $1 $dir
+if [ $? == 84 ];then
+    exit 84
+fi
+parse_c_files $1 $dir
+if [[ $? == 84 ]];then
+    rm -f "$dir/Makefile"
+    exit 84
+fi
+fill_c_files $dir
+if [[ -z $(find_args $1 HEADERS_DIR) ]];then
+    parse_headers $1
+    fill_headers_file $dir
+fi
+add_rules $dir
